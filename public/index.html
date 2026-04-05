@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <title>C2 Tactical Command</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div id="login-overlay">
+        <h1 style="font-size: 1.8rem; margin-bottom: 5px; font-weight: 300; letter-spacing: 1px;">
+            Centro di Comando Tattico
+        </h1>
+
+        <h2
+            style="color: #ff8c00; margin-top: 0; font-size: 2.5rem; text-transform: uppercase; font-weight: bold; letter-spacing: 3px; text-shadow: 0 0 15px rgba(255, 140, 0, 0.4);">
+            Logistic Space Economy
+        </h2>
+
+        <a href="/auth/discord" class="btn-discord" style="margin-top: 30px;">Accedi con Discord</a>
+    </div>
+
+    <div id="banner-notifiche">Sistema Online.</div>
+
+    <button id="btn-toggle-pannello" onclick="togglePannello()">👁️ Nascondi Pannello</button>
+    <button id="btn-toggle-roster" onclick="toggleRoster()">👁️ Nascondi Roster</button>
+
+    <div id="sidebar">
+        <h2
+            style="color: #7289da; font-size: 13px; text-transform: uppercase; margin: 0 0 10px 0; border-bottom: 1px solid #444; padding-bottom: 5px;">
+            Roster Operativo</h2>
+        <div id="lista-squadre"><i>In attesa di schieramento...</i></div>
+        <hr style="border: 0; border-top: 1px solid #444; margin: 15px 0;">
+        <a href="/logout" class="btn-logout" style="display: block; text-align: center;">Esci dal Sistema</a>
+    </div>
+
+<div id="terminal-wrapper" class="minimizzato">
+        <div id="terminal-header" onclick="toggleTerminal(event)" style="cursor:pointer;">📜 Log Eventi <span id="terminal-status"></span></div>
+        <div id="terminal"></div>
+    </div>
+
+    <div id="pannello">
+        <div id="overlay-operatore">
+            <button id="btn-richiedi" onclick="richiediComando()">🔑 Richiedi Comando</button>
+        </div>
+
+        <div id="pannello-admin" style="display:none;">
+            <div class="titolo-pannello" style="color:#ffaaaa;">Alto Comando</div>
+            <select id="tendinaRichieste">
+                <option value="">Richieste...</option>
+            </select>
+            <button class="btn-azione" onclick="approvaRichiesta()">✅ Approva</button>
+            <select id="tendinaAutorizzati" style="margin-top:5px;">
+                <option value="">Autorizzati...</option>
+            </select>
+            <button class="btn-pericolo" onclick="revocaSingolo()">⛔ Revoca</button>
+        </div>
+
+        <div class="titolo-pannello">Mappe e Missioni</div>
+        <select id="tendinaMappe" onchange="selezionaDaTendina()"></select>
+        <div style="display: flex; gap: 5px; margin-top:5px;">
+            <button class="btn-pericolo" onclick="eliminaMappaCorrente()" title="Elimina Mappa">🗑️</button>
+            <input type="file" id="fileSfondo" style="display:none" onchange="inviaNuovoSfondo()">
+            <button class="btn-azione" onclick="document.getElementById('fileSfondo').click()">⬆️ Upload</button>
+        </div>
+        <div style="display: flex; gap: 5px; margin-top:5px;">
+            <button class="btn-azione" onclick="saveMission()">💾 Salva Preset</button>
+            <input type="file" id="loadSnap" style="display:none" onchange="loadMission(event)">
+            <button class="btn-azione" onclick="document.getElementById('loadSnap').click()">📂 Carica Preset</button>
+        </div>
+
+        <div class="titolo-pannello">Comandi Base</div>
+        <button onclick="resetZoom()">🔍 Ripristina Visuale</button>
+        <button onclick="toggleGriglia()">🌐 Griglia Coordinate</button>
+        <button id="btn-matita" onclick="toggleMatita()" style="border-color:#daa520;">✏️ Matita Libera</button>
+        <div style="display: flex; gap: 5px;">
+            <button onclick="undoDisegno()">↩️ Undo</button>
+            <button class="btn-pericolo" onclick="clearDisegni()">🗑️ Clear Matita</button>
+        </div>
+        <button class="btn-pericolo" onclick="eliminaSelezionati()" style="margin-top:5px;">🗑️ Elimina
+            Elementi</button>
+        <button class="btn-nuke" onclick="nukeMappa()" style="margin-top:10px;">⚠️ CLEAR ALL ⚠️</button>
+
+        <div class="titolo-pannello">Tattica</div>
+        <div class="gruppo-bottoni">
+            <button onclick="creaElemento('supply', 'poi')">SUPPLY</button>
+            <button onclick="creaElemento('health', 'poi')">MEDICO</button>
+            <button onclick="creaElemento('target', 'poi')">BERSAGLIO</button>
+            <button onclick="creaElemento('alert', 'poi')">ALLARME</button>
+            <button onclick="creaElemento('comms', 'poi')">COMMS</button>
+            <button onclick="creaElemento('destroy', 'poi')">DESTROY</button>
+            <button onclick="creaElemento('poi', 'poi')">POI</button>
+            <button onclick="creaElemento('mezzi', 'poi')">MEZZI</button>
+            <button onclick="creaElemento('command', 'squadra')">COMANDO</button>
+        </div>
+
+        <div class="titolo-pannello">Operativi</div>
+        <div class="gruppo-bottoni">
+            <button onclick="creaElemento('FPS', 'squadra')">FPS</button>
+            <button onclick="creaElemento('ADMIRAL', 'squadra')">ADMIRAL</button>
+            <button onclick="creaElemento('CAPITAL', 'squadra')">CAPITAL</button>
+            <button onclick="creaElemento('VOLO', 'squadra')">VOLO</button>
+            <button onclick="creaElemento('MINING', 'squadra')">MINING</button>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
